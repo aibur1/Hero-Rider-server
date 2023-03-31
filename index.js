@@ -9,7 +9,6 @@ const cors = require("cors");
 const UPLOADS_FOLDER = "./uploads";
 
 const storage = multer.diskStorage({
-
     destination: (req, file, cb) => {
       cb(null, UPLOADS_FOLDER);
     },
@@ -32,7 +31,6 @@ var upload = multer({
   },
   
   fileFilter : (req, file, cb) => {
-
     if(
       file.mimetype === "image/png" ||
       file.mimetype === "image/jpg" ||
@@ -84,34 +82,10 @@ const run = async () => {
 
       const {fullName, email, age, phone, address, area, vehicleName, vehicleModel, namePlate, term} = req.body;
       const files = req.files;
-      console.log("Count-->",files);
-
-      // const data = {
-      //   fullName:req.body.fullName,
-      //   email:req.body.email,
-      //   age:req.body.age,
-      //   phone:req.body.phone,
-      //   address:req.body.address,
-      //   vehicleName:req.body.vehicleName,
-      //   vehicleModel:req.body.vehicleModel,
-      //   namePlate:req.body.namePlate,
-      //   term:req.body.term,
-      //   files:req.files.map((file ) => {
-      //     return{
-      //       filename:file.originalname,
-      //       mimeType:file.mimetype,
-      //       data:file.buffer,
-      //     };
-      //   }),
-      // };
 
       const result = await userCollection.insertOne({fullName, email, age, phone, address, area, vehicleName, vehicleModel, namePlate, term, files});
       // console.log("backend result",result)
       res.send(result);
-
-      // const result = await userCollection.insertOne(data);
-      // res.send(result);
-
 
     });
 
