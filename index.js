@@ -1,7 +1,10 @@
 const express = require("express");
 const multer = require("multer");
+
+const { ObjectId } = require('bson');
+
 const path = require("path");
-const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const bodyParser= require('body-parser');
 require("dotenv").config();
 const cors = require("cors");
@@ -67,6 +70,8 @@ const run = async () => {
     const db = client.db("progHero");
     const userCollection = db.collection("user");
 
+  
+
     app.get("/users", async (req, res) => {
       const cursor = userCollection.find({});
       const result = await cursor.toArray();
@@ -79,7 +84,6 @@ const run = async () => {
       {name:'image3', maxCount:1},
     ]), async (req, res) => {
       
-
       const {fullName, email, age, phone, address, area, vehicleName, vehicleModel, namePlate, term} = req.body;
       const files = req.files;
 
@@ -89,57 +93,18 @@ const run = async () => {
 
     });
 
-
-    app.get("/user", async (req, res) => {
+    app.get("/user/name", async (req, res) => {
       const fullName = req.body.fullName;
-      const result = await userCollection.findOne({fullName });
-
-        return res.send({ status: true, data: result });
-    
-    });
-
-    app.get("/user/:id", async (req, res) => {
-
-      const id = req?.params?.id;
-      const result = await userCollection.findOne({_id:ObjectId(id)});
-        return res.send({ status: true, data: result });
-    
-    });
-
-    app.delete("/user/:id", async (req, res) => {
+      const result = await userCollection.findOne({fullName });  
       
-      const id = req.params.id;
-      const result = await userCollection.deleteOne({_id:ObjectId(id)});
-
-        return res.send({ status: true, message:"Successfully deleted!" });
-    
+        return res.send({ status: true, data: result }); 
     });
 
-    app.get("/user/:age", async (req, res) => {
-      
-      const age = req.params.age;
-      // console.log(age)
-      const result = await userCollection.find({age: {$gte:18, $lte:25 } });
-
-        return res.send({ status: true, data: result });
-    
-    });
-
-    
-
-    app.get("/user/:email", async (req, res) => {
-      const email = req.params.email;
-      const result = await userCollection.findOne({ email });
-      if (result?.email) {
-        return res.send({ status: true, data: result });
-      }
-
-      res.send({ status: false });
-    });
-
-    app.get("/user", async (req, res) => {
+    app.get("/user/phone", async (req, res) => {
       const phone = req.body.phone;
-      const result = await userCollection.findOne({ phone : phone });
+      console.log(phone);
+      const result = await userCollection.findOne({ phone : phone }); 
+      console.log("phne data", result);
       if (result?.phone) {
         return res.send({ status: true, data: result });
       }
@@ -147,17 +112,50 @@ const run = async () => {
       res.send({ status: false });
     });
 
+    app.get("/user/:id", async (req, res) => {
+      const id = req?.params?.id;
+      const result = await userCollection.findOne({_id: ObjectId(id)}); 
+        return res.send({ status: true, data: result }); 
+    
+    }); 
 
+
+    app.get("/user/email/:email", async (req, res) => {
+      const email = req.params.email;
+      const result = await userCollection.findOne({ email });
+      if (result?.email) {
+        return res.send({ status: true, data: result });
+      }
+      res.send({ status: false });
+    });
+
+    app.get("/user/age/:age", async (req, res) => {
+      const age = req.params.age;
+      console.log(age);
+      const result = await userCollection.find({age: {$gte:18, $lte:25 }});
+      // const result = await userCollection.find({age});
+        return res.send({ status: true, data: result });
+    });
+
+
+    app.delete("/user/:id", async (req, res) => {
+      
+      const id = req?.params?.id;
+      const result = await userCollection.deleteOne({_id:ObjectId(id)});
+        return res.send({ status: true, message:"Successfully deleted!" }); 
+    });
+
+   
     app.use((err, req, res, next) => {
       if(err){
         if(err instanceof multer.MulterError) {
-          res.status(500).send("There was an upload error!");
+          res.status(500).send("There was an upload error!"); 
         }
          else{
           res.status(500).send(err.message);
          }
       }else{
-        res.send("Success");
+        res.send("Success"); 
       }
     })
 
